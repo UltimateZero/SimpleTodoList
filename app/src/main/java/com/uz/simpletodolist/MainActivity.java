@@ -1,5 +1,7 @@
 package com.uz.simpletodolist;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +13,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -50,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addTask("bla bla", "body test");
+               // addTask("bla bla", "body test");
+                addTask();
             }
         });
 
@@ -96,6 +101,33 @@ public class MainActivity extends AppCompatActivity {
     private void loggedIn() {
         getTasks();
 
+    }
+
+    private void addTask() {
+        final EditText txtTaskTitle = new EditText(this);
+        final EditText txtTaskBody = new EditText(this);
+        txtTaskTitle.setHint("Write task title");
+        txtTaskBody.setHint("Write task description");
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.addView(txtTaskTitle, 0);
+        layout.addView(txtTaskBody, 1);
+
+        AlertDialog alert = new AlertDialog.Builder(this)
+                .setTitle("Add Task")
+                .setView(layout)
+                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (txtTaskTitle.getText().toString().trim().length() > 0) {
+                            addTask(txtTaskTitle.getText().toString().trim(),
+                                    txtTaskBody.getText().toString().trim());
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        alert.show();
     }
 
     private void updateTask(Task task) {
