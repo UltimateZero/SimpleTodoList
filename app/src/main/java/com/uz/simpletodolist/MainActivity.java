@@ -1,9 +1,14 @@
 package com.uz.simpletodolist;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -11,6 +16,8 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.uz.simpletodolist.adapters.TaskAdapter;
+import com.uz.simpletodolist.adapters.onTaskMarkedListener;
 import com.uz.simpletodolist.core.ConnectionManager;
 import com.uz.simpletodolist.model.Task;
 
@@ -21,13 +28,13 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
-
+    private static final String TASKS_ADAPTER_KEY = "TaskAdapterKey";
     ListView listTasks;
     Button btnAdd;
     Button btnRefresh;
 
     ArrayList<Task> tasks;
-    ArrayAdapter<Task> adapter;
+    TaskAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +61,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        tasks = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, tasks);
+
+        registerForContextMenu(listTasks);
+        listTasks.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return true;
+            }
+        });
+
+        if(savedInstanceState == null) {
+            tasks = new ArrayList<>();
+        }
+        else {
+            tasks = (ArrayList<Task>) savedInstanceState.getSerializable(TASKS_ADAPTER_KEY);
+        }
+        adapter = new TaskAdapter(this, tasks, new onTaskMarkedListener() {
+            @Override
+            public void onTaskMarked(Task task, boolean done) {
+                if(done)
+                    markTask(task);
+                else
+                    updateTask(task);
+            }
+        });
         listTasks.setAdapter(adapter);
 
-        login();
+        if(savedInstanceState == null)
+            login();
+
     }
 
 
@@ -80,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void deleteTask(Task task) {
+        adapter.remove(task);
+        deleteTask(task.getId());
+    }
     private void deleteTask(int id) {
         ConnectionManager.getInstance().deleteTask(id, new Response.Listener<String>() {
             @Override
@@ -89,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if(error.networkResponse != null && error.networkResponse.statusCode == 404) {
+                if (error.networkResponse != null && error.networkResponse.statusCode == 404) {
                     return;
                 }
                 error.printStackTrace();
@@ -98,8 +133,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void markTask(int id, boolean done) {
-        ConnectionManager.getInstance().markTask(id, done, new Response.Listener<Task>() {
+    private void markTask(Task task) {
+        ConnectionManager.getInstance().markTask(task.getId(), new Response.Listener<Task>() {
             @Override
             public void onResponse(Task response) {
                 Log.d(TAG, response.toString());
@@ -156,13 +191,47 @@ public class MainActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        if(error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
                             Toast.makeText(MainActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
-                        }
-                        else
+                        } else
                             Toast.makeText(MainActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
         );
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        if (v.getId()==R.id.listTasks) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+            menu.setHeaderTitle("Id: " + (adapter.getItem(info.position)).getId());
+            menu.add(Menu.NONE, 0, 0, "Delete");
+            menu.add(Menu.NONE, 1, 0, "Edit");
+
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        Task task = (adapter.getItem(info.position));
+        if(menuItemIndex == 0) {
+            deleteTask(task);
+        }
+        else if(menuItemIndex == 1) {
+            Intent intent = new Intent();
+            intent.setClass(this, ViewTaskActivity.class);
+            startActivity(intent);
+        }
+
+        return true;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putSerializable(TASKS_ADAPTER_KEY, tasks);
+        super.onSaveInstanceState(outState);
     }
 }

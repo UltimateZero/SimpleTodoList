@@ -178,6 +178,7 @@ public class ConnectionManager  {
         try {
             bodyObject.put("title", task.getTitle());
             bodyObject.put("body", task.getBody());
+            bodyObject.put("done", task.isDone());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -216,11 +217,10 @@ public class ConnectionManager  {
         queue.add(request);
     }
 
-    public void markTask(int taskId, boolean done, final Response.Listener<Task> listener, final Response.ErrorListener errorListener) {
-
+    public void markTask(int taskId, final Response.Listener<Task> listener, final Response.ErrorListener errorListener) {
         JSONObject bodyObject = new JSONObject();
         try {
-            bodyObject.put("done", done);
+            bodyObject.put("done", true);
         } catch (JSONException e) {
             e.printStackTrace();
         }

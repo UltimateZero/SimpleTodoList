@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip">
+    <TextView
+        android:id="@+id/rowId"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:gravity="center_vertical"
+        android:text="1. "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#7d7d7d" />
+<CheckBox
+    android:id="@+id/boxDone"
+    android:focusable="false"
+    android:layout_toRightOf="@+id/rowId"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true" />
+    <TextView
+        android:textColor="@color/colorAccent"
+        android:id="@+id/taskTitle"
+        android:layout_marginLeft="6dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/boxDone"
+        android:gravity="center_vertical"
+        android:text="Title"
+        android:textSize="16sp"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerVertical="true"
+        android:textStyle="bold" />
+</RelativeLayout>

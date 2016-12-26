@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SimpleTodoList</string>
+    <string name="title_activity_view_task">ViewTaskActivity</string>
 </resources>

@@ -1,15 +1,15 @@
 package com.uz.simpletodolist.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by UltimateZero on 12/26/2016.
  */
-public class Task {
+public class Task implements Serializable {
     private int id;
     private String title;
     private String body;
-    private int userId;
     private boolean done;
     private String createdAt;
 
@@ -62,7 +62,6 @@ public class Task {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +
-                ", userId=" + userId +
                 ", done=" + done +
                 ", createdAt='" + createdAt + '\'' +
                 '}';
