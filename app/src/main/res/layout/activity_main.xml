@@ -9,8 +9,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.uz.simpletodolist.MainActivity">
 
-    <TextView
+    <ListView
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/btnRefresh"
+        android:id="@+id/listTasks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></ListView>
+    <Button
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/btnRefresh"
+        android:id="@+id/btnAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Add random new"/>
+    <Button
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:id="@+id/btnRefresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Refresh"
+        />
 </RelativeLayout>
