@@ -12,13 +12,17 @@ import java.net.URL;
  */
 public class ProxiedHurlStack extends HurlStack {
 
-    private static final String PROXY_ADDRESS = "192.168.1.3";
+    private static final String PROXY_ADDRESS = "192.168.1.10";
     private static final int PROXY_PORT = 8888;//change with the port of the proxy
+    private static final boolean ENABLED = false;
 
     @Override
     protected HttpURLConnection createConnection(URL url) throws IOException {
         Proxy proxy = new Proxy(Proxy.Type.HTTP,
                 InetSocketAddress.createUnresolved(PROXY_ADDRESS, PROXY_PORT));
-        return (HttpURLConnection) url.openConnection(proxy);
+        if(ENABLED)
+            return (HttpURLConnection) url.openConnection(proxy);
+        else
+            return (HttpURLConnection) url.openConnection();
     }
 }
