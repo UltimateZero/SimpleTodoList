@@ -1,5 +1,6 @@
 package com.uz.simpletodolist;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -75,10 +76,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         registerForContextMenu(listTasks);
-        listTasks.setOnLongClickListener(new View.OnLongClickListener() {
+        listTasks.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 return true;
+            }
+        });
+        listTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                editTask(adapter.getItem(position));
             }
         });
 
@@ -133,30 +140,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addTask() {
-        final EditText txtTaskTitle = new EditText(this);
-        final EditText txtTaskBody = new EditText(this);
-        txtTaskTitle.setHint("Write task title");
-        txtTaskBody.setHint("Write task description");
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.addView(txtTaskTitle, 0);
-        layout.addView(txtTaskBody, 1);
-
-        AlertDialog alert = new AlertDialog.Builder(this)
-                .setTitle("Add Task")
-                .setView(layout)
-                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (txtTaskTitle.getText().toString().trim().length() > 0) {
-                            addTask(txtTaskTitle.getText().toString().trim(),
-                                    txtTaskBody.getText().toString().trim());
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .create();
-        alert.show();
+        editTask(null);
     }
 
     private void updateTask(Task task) {
@@ -265,6 +249,13 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    private void editTask(Task task) {
+        Intent intent = new Intent();
+        intent.setClass(this, ViewTaskActivity.class);
+        intent.putExtra("TASK", task);
+        startActivityForResult(intent, 1);
+    }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
@@ -278,6 +269,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == Activity.RESULT_CANCELED || data == null) return;
+        Task receivedTask = (Task) data.getSerializableExtra("TASK");
+        Task ownTask = adapter.findTaskById(receivedTask.getId());
+        if(ownTask != null) {
+            if(data.getBooleanExtra("DELETE", false)) {
+                deleteTask(ownTask.getId());
+                adapter.remove(ownTask);
+                showToast("Task deleted");
+                return;
+            }
+            if(ownTask.getTitle().equals(receivedTask.getTitle())
+                    && ownTask.getBody().equals(receivedTask.getBody())) return;
+            ownTask.setTitle(receivedTask.getTitle());
+            ownTask.setBody(receivedTask.getBody());
+            updateTask(ownTask);
+            adapter.notifyDataSetChanged();
+        }
+        else {
+            addTask(receivedTask.getTitle(), receivedTask.getBody());
+        }
+        showToast("Saved");
+
+
+    }
+
+    @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
         int menuItemIndex = item.getItemId();
@@ -286,11 +305,7 @@ public class MainActivity extends AppCompatActivity {
             deleteTask(task);
         }
         else if(menuItemIndex == 1) {
-            Intent intent = new Intent();
-            intent.setClass(this, ViewTaskActivity.class);
-            intent.putExtra("TASK_TITLE", task.getTitle());
-            intent.putExtra("TASK_BODY", task.getBody());
-            startActivity(intent);
+            editTask(task);
         }
 
         return true;

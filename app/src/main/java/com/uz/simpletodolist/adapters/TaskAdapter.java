@@ -38,6 +38,14 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         this.taskMarkedListener = taskMarkedListener;
     }
 
+    public Task findTaskById(int id) {
+        for(Task task : tasks){
+            if(task.getId() == id)
+                return task;
+        }
+        return null;
+    }
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {

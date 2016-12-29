@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_close_no_save"
+        app:showAsAction="never"
+        android:title="Close without saving"/>
+    <item
+        android:id="@+id/menu_delete_task"
+        app:showAsAction="never"
+        android:title="Delete"/>
+</menu>

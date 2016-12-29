@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by UltimateZero on 12/26/2016.
  */
 public class Task implements Serializable {
-    private int id;
+    private int id = -1;
     private String title;
     private String body;
     private boolean done;

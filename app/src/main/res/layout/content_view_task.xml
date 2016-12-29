@@ -14,17 +14,52 @@
 
     <EditText
         android:id="@+id/txtTitle"
+        android:visibility="invisible"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter task title"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:inputType="text" />
 
     <EditText
         android:id="@+id/txtBody"
+        android:visibility="invisible"
         android:layout_below="@+id/txtTitle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:hint="Enter task description"
-        android:gravity="top|left" />
+        android:gravity="top|left"
+        android:inputType="text|textMultiLine" />
+
+
+    <TextView
+        android:id="@+id/txtTitleRead"
+        android:textIsSelectable="true"
+        android:layout_alignBaseline="@+id/txtTitle"
+        android:layout_alignBottom="@+id/txtTitle"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter task title"
+        android:maxLines="1"
+        android:breakStrategy="simple"
+        android:background="?attr/editTextBackground"
+        android:textColor="?attr/editTextColor"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/txtBodyRead"
+        android:textIsSelectable="true"
+        android:layout_below="@+id/txtTitleRead"
+        android:layout_alignBaseline="@+id/txtBody"
+        android:layout_alignBottom="@+id/txtBody"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:breakStrategy="simple"
+        android:hint="Enter task description"
+        android:gravity="top|left"
+        android:background="?attr/editTextBackground"
+        android:textColor="?attr/editTextColor"
+        android:textSize="18sp" />
 </RelativeLayout>
