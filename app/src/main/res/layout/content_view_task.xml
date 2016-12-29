@@ -12,4 +12,19 @@
     tools:context="com.uz.simpletodolist.ViewTaskActivity"
     tools:showIn="@layout/activity_view_task">
 
+    <EditText
+        android:id="@+id/txtTitle"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter task title"
+        android:maxLines="1" />
+
+    <EditText
+        android:id="@+id/txtBody"
+        android:layout_below="@+id/txtTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="Enter task description"
+        android:gravity="top|left" />
 </RelativeLayout>

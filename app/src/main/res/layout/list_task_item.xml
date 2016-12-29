@@ -3,33 +3,46 @@
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:padding="6dip">
+
     <TextView
         android:id="@+id/rowId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:gravity="center_vertical"
         android:text="1. "
+        android:textColor="#7d7d7d" />
+
+    <CheckBox
+        android:id="@+id/boxDone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#7d7d7d" />
-<CheckBox
-    android:id="@+id/boxDone"
-    android:focusable="false"
-    android:layout_toRightOf="@+id/rowId"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/rowId"
+        android:focusable="false" />
+
     <TextView
-        android:textColor="@color/colorAccent"
         android:id="@+id/taskTitle"
-        android:layout_marginLeft="6dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="6dp"
         android:layout_toRightOf="@id/boxDone"
         android:gravity="center_vertical"
         android:text="Title"
+        android:textColor="@color/colorAccent"
         android:textSize="16sp"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_centerVertical="true"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/creationDate"
+        android:text="Dec, 29 2016 10:43:49 AM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:textSize="12sp"
+        />
 </RelativeLayout>

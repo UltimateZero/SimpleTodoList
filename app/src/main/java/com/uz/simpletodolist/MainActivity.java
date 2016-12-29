@@ -3,8 +3,12 @@ package com.uz.simpletodolist;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -33,38 +37,41 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
     private static final String TASKS_ADAPTER_KEY = "TaskAdapterKey";
+
+    SwipeRefreshLayout swipeRefreshLayout;
     ListView listTasks;
-    Button btnAdd;
-    Button btnRefresh;
+
 
     ArrayList<Task> tasks;
     TaskAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         ConnectionManager.setContext(getApplicationContext());
 
-
-        btnAdd = (Button) findViewById(R.id.btnAdd);
-        btnRefresh = (Button) findViewById(R.id.btnRefresh);
-        listTasks = (ListView) findViewById(R.id.listTasks);
-
-
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
-               // addTask("bla bla", "body test");
+            public void onRefresh() {
+                getTasks();
+            }
+        });
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 addTask();
             }
         });
 
-        btnRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getTasks();
-            }
-        });
+
+        listTasks = (ListView) findViewById(R.id.listTasks);
+
+
 
 
         registerForContextMenu(listTasks);
@@ -97,10 +104,32 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_refresh:
+                swipeRefreshLayout.setRefreshing(true);
+                getTasks();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     private void loggedIn() {
         getTasks();
 
+    }
+
+    private void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     private void addTask() {
@@ -203,11 +232,15 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, task.toString());
                     MainActivity.this.adapter.add(task);
                 }
+                MainActivity.this.swipeRefreshLayout.setRefreshing(false);
+               //MainActivity.this.showToast("Refreshed");
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+                MainActivity.this.swipeRefreshLayout.setRefreshing(false);
+                MainActivity.this.showToast("Error occurred");
             }
         });
     }
@@ -255,6 +288,8 @@ public class MainActivity extends AppCompatActivity {
         else if(menuItemIndex == 1) {
             Intent intent = new Intent();
             intent.setClass(this, ViewTaskActivity.class);
+            intent.putExtra("TASK_TITLE", task.getTitle());
+            intent.putExtra("TASK_BODY", task.getBody());
             startActivity(intent);
         }
 

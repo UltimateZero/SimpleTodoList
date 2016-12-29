@@ -1,6 +1,7 @@
 package com.uz.simpletodolist.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,13 @@ import com.uz.simpletodolist.model.Task;
 
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Created by UltimateZero on 12/26/2016.
@@ -44,6 +51,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
             viewHolder.txtTitle = (TextView) rowView.findViewById(R.id.taskTitle);
             viewHolder.boxDone = (CheckBox) rowView.findViewById(R.id.boxDone);
             viewHolder.txtRowId = (TextView) rowView.findViewById(R.id.rowId);
+            viewHolder.txtCreationDate = (TextView) rowView.findViewById(R.id.creationDate);
             rowView.setTag(viewHolder);
 
         }
@@ -53,6 +61,7 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         final Task task = tasks.get(position);
         holder.txtRowId.setText(position+1 + ". ");
         holder.txtTitle.setText(task.getTitle());
+        holder.txtCreationDate.setText(formatCreationDate(task.getCreatedAt()));
         holder.boxDone.setChecked(task.isDone());
         holder.boxDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,10 +77,25 @@ public class TaskAdapter extends ArrayAdapter<Task> {
 
         return rowView;
     }
+    private static String formatCreationDate(String dateString) {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        inputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy h:mm a");
+
+        try {
+            Date date = inputFormat.parse(dateString);
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     static class ViewHolder {
         public TextView txtRowId;
         public TextView txtTitle;
+        public TextView txtCreationDate;
         public CheckBox boxDone;
     }
 
