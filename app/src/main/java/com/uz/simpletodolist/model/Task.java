@@ -7,13 +7,28 @@ import java.util.Date;
  * Created by UltimateZero on 12/26/2016.
  */
 public class Task implements Serializable {
+    private int localId = -1;
     private int id = -1;
     private String title;
     private String body;
     private boolean done;
     private String createdAt;
+    private String syncedAt;
+    private boolean synced;
+
+
+
+
 
     public Task() { }
+
+    public int getLocalId() {
+        return localId;
+    }
+
+    public void setLocalId(int localId) {
+        this.localId = localId;
+    }
 
     public int getId() {
         return id;
@@ -55,6 +70,24 @@ public class Task implements Serializable {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
+
+    public boolean isSynced() {
+        return synced;
+    }
+
+    public void setSynced(boolean synced) {
+        this.synced = synced;
+    }
+
+
+    public String getSyncedAt() {
+        return syncedAt;
+    }
+
+    public void setSyncedAt(String syncedAt) {
+        this.syncedAt = syncedAt;
+    }
+
 
     @Override
     public String toString() {

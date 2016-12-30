@@ -28,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.uz.simpletodolist.adapters.TaskAdapter;
 import com.uz.simpletodolist.adapters.onTaskMarkedListener;
 import com.uz.simpletodolist.core.ConnectionManager;
+import com.uz.simpletodolist.core.DatabaseManager;
 import com.uz.simpletodolist.model.Task;
 
 import org.json.JSONObject;
@@ -72,7 +73,10 @@ public class MainActivity extends AppCompatActivity {
 
         listTasks = (ListView) findViewById(R.id.listTasks);
 
-
+        Task dummy = new Task();
+        dummy.setTitle("test title");
+        dummy.setBody("test desc");
+        //DatabaseManager.getInstance(this).insertTask(dummy);
 
 
         registerForContextMenu(listTasks);

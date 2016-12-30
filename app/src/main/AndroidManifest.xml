@@ -14,8 +14,7 @@
         <activity
             android:name=".MainActivity"
             android:label="MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,14 +24,22 @@
         <activity
             android:name=".ViewTaskActivity"
             android:label="@string/title_activity_view_task"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName="com.uz.simpletodolist.MainActivity"
-            >
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.uz.simpletodolist.MainActivity" />
-    </activity>
+        </activity>
+        <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".RegisterActivity"></activity>
     </application>
 
 </manifest>
