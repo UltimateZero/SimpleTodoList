@@ -15,6 +15,7 @@ public class Task implements Serializable {
     private String createdAt;
     private String syncedAt;
     private boolean synced;
+    private boolean deleted;
 
 
 
@@ -88,15 +89,26 @@ public class Task implements Serializable {
         this.syncedAt = syncedAt;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
     @Override
     public String toString() {
         return "Task{" +
-                "id=" + id +
+                "localId=" + localId +
+                ", id=" + id +
                 ", title='" + title + '\'' +
                 ", body='" + body + '\'' +
                 ", done=" + done +
                 ", createdAt='" + createdAt + '\'' +
+                ", syncedAt='" + syncedAt + '\'' +
+                ", synced=" + synced +
+                ", deleted=" + deleted +
                 '}';
     }
 }

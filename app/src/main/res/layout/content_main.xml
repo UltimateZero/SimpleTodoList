@@ -12,9 +12,21 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.uz.simpletodolist.MainActivity"
     tools:showIn="@layout/activity_main">
-    <ListView
-        android:id="@+id/listTasks"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/listTasks"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
+        <TextView
+            android:text="No tasks"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/empty"
+            android:gravity="center" />
+    </RelativeLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>

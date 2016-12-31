@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.uz.simpletodolist.model.Task;
@@ -82,6 +83,7 @@ public class ViewTaskActivity extends AppCompatActivity {
         setInEdit(inEdit);
 
 
+
     }
 
 
@@ -97,6 +99,14 @@ public class ViewTaskActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_view_task, menu);
+        MenuItem deleteMenuItem = menu.findItem(R.id.menu_delete_task);
+        if(currentTask.getLocalId() == -1) { //new
+
+            deleteMenuItem.setEnabled(false);
+        }
+        else {
+            deleteMenuItem.setEnabled(true);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -134,7 +144,7 @@ public class ViewTaskActivity extends AppCompatActivity {
             title = body.split("\n")[0];
         }
         if (title.isEmpty()) {
-            if (currentTask.getId() == -1) { //new task
+            if (currentTask.getLocalId() == -1) { //new task
                 //exit normally
                 setResult(Activity.RESULT_CANCELED);
             } else {
@@ -142,7 +152,12 @@ public class ViewTaskActivity extends AppCompatActivity {
                 txtTitle.setError("Must enter title");
                 return;
             }
-        } else {
+        }
+
+        else {
+            if(body.isEmpty()) {
+                body = title;
+            }
             currentTask.setTitle(title);
             currentTask.setBody(body);
             Intent intent = new Intent();

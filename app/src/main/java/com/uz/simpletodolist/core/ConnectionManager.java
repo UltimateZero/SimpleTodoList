@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -51,7 +52,15 @@ public class ConnectionManager  {
         if(instance == null){
             instance = new ConnectionManager();
         }
-        return  instance;
+        return instance;
+    }
+    public static synchronized ConnectionManager getInstance(Context ctx) {
+
+        if(instance == null){
+            setContext(ctx);
+            instance = new ConnectionManager();
+        }
+        return instance;
     }
 
     public static void setContext(Context ctx) {
@@ -61,7 +70,7 @@ public class ConnectionManager  {
 
 
 
-    RequestQueue queue;
+    private RequestQueue queue;
 
     private String uid;
     private String client;
@@ -72,44 +81,44 @@ public class ConnectionManager  {
         NukeSSLCerts.nuke();
         queue = Volley.newRequestQueue(context, new ProxiedHurlStack());
 
+
     }
 
     public void login(final String email, final String password,
-                      final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+                      final AsyncVolleyRequest<JSONObject> listener) {
 
         Map<String, String> params = new HashMap<>();
         params.put("email", email);
         params.put("password", password);
         CustomRequest request = new CustomRequest(Request.Method.POST,
                 Constants.BASE_URL + Constants.SIGN_IN,
-                null, params,
-                new Response.Listener<JsonResponse>() {
-                    @Override
-                    public void onResponse(JsonResponse response) {
-                        Log.d(TAG, response.jsonArray.toString());
-                        uid = response.headers.get("Uid");
-                        accessToken = response.headers.get("Access-Token");
-                        client = response.headers.get("Client");
-                        defaultHeaders = new HashMap<>();
-                        defaultHeaders.put("Uid", uid);
-                        defaultHeaders.put("Client", client);
-                        defaultHeaders.put("Access-Token", accessToken);
+                null, params, new ApiListener() {
+            @Override
+            public void onResponse(JsonResponse response) {
+                Log.d(TAG, response.jsonArray.toString());
+                uid = response.headers.get("Uid");
+                accessToken = response.headers.get("Access-Token");
+                client = response.headers.get("Client");
+                defaultHeaders = new HashMap<>();
+                defaultHeaders.put("Uid", uid);
+                defaultHeaders.put("Client", client);
+                defaultHeaders.put("Access-Token", accessToken);
 
-                        try {
-                            JSONObject result = response.jsonArray.getJSONObject(0);
-                            listener.onResponse(result);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        errorListener.onErrorResponse(error);
-                    }
+                try {
+                    JSONObject result = response.jsonArray.getJSONObject(0);
+                    listener.onResponse(result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+                listener.onError(error);
+            }
+        }
         );
+
 
         queue.add(request);
 
@@ -117,7 +126,7 @@ public class ConnectionManager  {
     }
 
 
-    public void register(String email, String password, final Response.Listener<JSONObject> listener, final Response.ErrorListener errorListener) {
+    public void register(String email, String password, final AsyncVolleyRequest<JSONObject> listener) {
         Map<String, String> params = new HashMap<>();
         params.put("email", email);
         params.put("password", password);
@@ -125,7 +134,7 @@ public class ConnectionManager  {
         CustomRequest request = new CustomRequest(Request.Method.POST,
                 Constants.BASE_URL + Constants.AUTH,
                 null, params,
-                new Response.Listener<JsonResponse>() {
+                new ApiListener() {
                     @Override
                     public void onResponse(JsonResponse response) {
                         Log.d(TAG, response.jsonArray.toString());
@@ -137,43 +146,40 @@ public class ConnectionManager  {
                             e.printStackTrace();
                         }
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        errorListener.onErrorResponse(error);
+                    public void onError(VolleyError error) {
+                        listener.onError(error);
                     }
                 }
         );
-
+        request.setRetryPolicy(new DefaultRetryPolicy(2500,0,1f));
         queue.add(request);
     }
 
-    public void deleteTask(int taskId, final Response.Listener<String> listener, final Response.ErrorListener errorListener) {
+    public void deleteTask(int taskId, final AsyncVolleyRequest<String> listener) {
         CustomRequest request = new CustomRequest(Request.Method.DELETE,
                 Constants.BASE_URL + Constants.NOTES + "/" + taskId,
                 defaultHeaders,
-                new Response.Listener<JsonResponse>() {
+                new ApiListener() {
                     @Override
                     public void onResponse(JsonResponse response) {
                         Log.d(TAG, ""+response.jsonArray);
 
-                            listener.onResponse(""+response.jsonArray);
-
+                        listener.onResponse(""+response.jsonArray);
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        errorListener.onErrorResponse(error);
+                    public void onError(VolleyError error) {
+                        listener.onError(error);
                     }
                 }
         );
-
+        request.setRetryPolicy(new DefaultRetryPolicy(2500,0,1f));
         queue.add(request);
     }
 
-    public void updateTask(Task task, final Response.Listener<Task> listener, final Response.ErrorListener errorListener) {
+    public void updateTask(Task task, final AsyncVolleyRequest<Task> listener) {
         JSONObject bodyObject = new JSONObject();
         try {
             bodyObject.put("title", task.getTitle());
@@ -186,7 +192,7 @@ public class ConnectionManager  {
         CustomRequest request = new CustomRequest(Request.Method.PUT,
                 Constants.BASE_URL + Constants.NOTES + "/" + task.getId(),
                 defaultHeaders, bodyObject,
-                new Response.Listener<JsonResponse>() {
+                new ApiListener() {
                     @Override
                     public void onResponse(JsonResponse response) {
                         Log.d(TAG, response.jsonArray.toString());
@@ -205,19 +211,18 @@ public class ConnectionManager  {
                             e.printStackTrace();
                         }
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        errorListener.onErrorResponse(error);
+                    public void onError(VolleyError error) {
+                        listener.onError(error);
                     }
                 }
         );
-
+        request.setRetryPolicy(new DefaultRetryPolicy(2500,0,1f));
         queue.add(request);
     }
 
-    public void markTask(int taskId, final Response.Listener<Task> listener, final Response.ErrorListener errorListener) {
+    public void markTask(int taskId, final AsyncVolleyRequest<Task> listener) {
         JSONObject bodyObject = new JSONObject();
         try {
             bodyObject.put("done", true);
@@ -227,7 +232,7 @@ public class ConnectionManager  {
         CustomRequest request = new CustomRequest(Request.Method.POST,
                 Constants.BASE_URL + Constants.NOTES + "/" + taskId + "/done",
                 defaultHeaders, bodyObject,
-                new Response.Listener<JsonResponse>() {
+                new ApiListener() {
                     @Override
                     public void onResponse(JsonResponse response) {
                         Log.d(TAG, response.jsonArray.toString());
@@ -246,19 +251,18 @@ public class ConnectionManager  {
                             e.printStackTrace();
                         }
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        errorListener.onErrorResponse(error);
+                    public void onError(VolleyError error) {
+                        listener.onError(error);
                     }
                 }
         );
-
+        request.setRetryPolicy(new DefaultRetryPolicy(2500,0,1f));
         queue.add(request);
     }
 
-    public void addTask(String taskTitle, String taskBody, final Response.Listener<Task> listener, final Response.ErrorListener errorListener) {
+    public void addTask(String taskTitle, String taskBody, final AsyncVolleyRequest<Task> listener) {
 
         JSONObject bodyObject = new JSONObject();
         try {
@@ -271,7 +275,7 @@ public class ConnectionManager  {
         CustomRequest request = new CustomRequest(Request.Method.POST,
                 Constants.BASE_URL + Constants.NOTES,
                 defaultHeaders, bodyObject,
-                new Response.Listener<JsonResponse>() {
+                new ApiListener() {
                     @Override
                     public void onResponse(JsonResponse response) {
                         Log.d(TAG, response.jsonArray.toString());
@@ -290,25 +294,24 @@ public class ConnectionManager  {
                             e.printStackTrace();
                         }
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        errorListener.onErrorResponse(error);
+                    public void onError(VolleyError error) {
+                        listener.onError(error);
                     }
                 }
         );
-
+        request.setRetryPolicy(new DefaultRetryPolicy(2500,0,1f));
         queue.add(request);
     }
 
-    public void getTasks(final Response.Listener<List<Task>> listener, final Response.ErrorListener errorListener) {
+    public void getTasks(final AsyncVolleyRequest<List<Task>> listener) {
 
 
         CustomRequest request = new CustomRequest(Request.Method.GET,
                 Constants.BASE_URL + Constants.NOTES,
                 defaultHeaders,
-                new Response.Listener<JsonResponse>() {
+                new ApiListener() {
                     @Override
                     public void onResponse(JsonResponse response) {
                         Log.d(TAG, response.jsonArray.toString());
@@ -332,20 +335,39 @@ public class ConnectionManager  {
 
                         listener.onResponse(tasks);
                     }
-                },
-                new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        errorListener.onErrorResponse(error);
+                    public void onError(VolleyError error) {
+                        listener.onError(error);
                     }
                 }
         );
-
+        request.setRetryPolicy(new DefaultRetryPolicy(2500,0,1f));
         queue.add(request);
 
     }
 
 
+    public void logout() {
+        CustomRequest request = new CustomRequest(Request.Method.DELETE,
+                Constants.BASE_URL + Constants.SIGN_OUT,
+                defaultHeaders,
+                new ApiListener() {
+                    @Override
+                    public void onResponse(JsonResponse response) {
+                        Log.d(TAG, ""+response.jsonArray);
+
+                    }
+
+                    @Override
+                    public void onError(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                }
+        );
+        request.setRetryPolicy(new DefaultRetryPolicy(2500,0,1f));
+        queue.add(request);
+    }
 }
   class NukeSSLCerts {
     protected static final String TAG = "NukeSSLCerts";

@@ -18,6 +18,7 @@ import org.w3c.dom.Text;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -28,23 +29,38 @@ import java.util.TimeZone;
  */
 public class TaskAdapter extends ArrayAdapter<Task> {
     private Context context;
-    private List<Task> tasks;
+    private ArrayList<Task> tasks;
     private onTaskMarkedListener taskMarkedListener;
 
-    public TaskAdapter(Context context, List<Task> tasks, onTaskMarkedListener taskMarkedListener) {
+    public TaskAdapter(Context context, ArrayList<Task> tasks, onTaskMarkedListener taskMarkedListener) {
         super(context, -1, tasks);
         this.context = context;
         this.tasks = tasks;
         this.taskMarkedListener = taskMarkedListener;
     }
 
-    public Task findTaskById(int id) {
+    public Task findTaskById(int localId) {
         for(Task task : tasks){
-            if(task.getId() == id)
+            if(task.getLocalId() == localId)
                 return task;
         }
         return null;
     }
+
+    public ArrayList<Task> getList() {
+        return tasks;
+    }
+
+    @Override
+    public int getCount() {
+        return tasks.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return getCount() == 0;
+    }
+
 
 
     @Override

@@ -5,6 +5,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 
 import org.json.JSONArray;
@@ -18,15 +19,19 @@ import java.util.Map;
  * Created by UltimateZero on 12/26/2016.
  */
 public class CustomRequest extends Request<JsonResponse> {
-    private final Response.Listener<JsonResponse> listener;
+    private final ApiListener listener;
     private final Map<String, String> headers;
     private final Map<String, String> params;
     private final JSONObject jsonObject;
     public CustomRequest(int method, String url, Map<String, String> headers,
-                         Map<String, String> params,
-                         Response.Listener<JsonResponse> listener,
-                         Response.ErrorListener errorListener) {
-        super(method, url, errorListener);
+                         Map<String, String> params, final ApiListener listener) {
+
+        super(method, url, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                listener.onError(error);
+            }
+        });
         this.listener = listener;
         this.headers = headers;
         this.params = params;
@@ -34,10 +39,14 @@ public class CustomRequest extends Request<JsonResponse> {
     }
 
     public CustomRequest(int method, String url, Map<String, String> headers,
-                         JSONObject body,
-                         Response.Listener<JsonResponse> listener,
-                         Response.ErrorListener errorListener) {
-        super(method, url, errorListener);
+                         JSONObject body, final ApiListener listener) {
+        super(method, url, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                listener.onError(error);
+            }
+        });
+
         this.listener = listener;
         this.headers = headers;
         params = null;
@@ -45,9 +54,14 @@ public class CustomRequest extends Request<JsonResponse> {
     }
 
     public CustomRequest(int method, String url, Map<String, String> headers,
-                         Response.Listener<JsonResponse> listener,
-                         Response.ErrorListener errorListener) {
-        super(method, url, errorListener);
+                         final ApiListener listener) {
+        super(method, url, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                listener.onError(error);
+            }
+        });
+
         this.listener = listener;
         this.headers = headers;
         params = null;

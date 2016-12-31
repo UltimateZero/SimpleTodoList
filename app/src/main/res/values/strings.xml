@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name">SimpleTodoList</string>
-    <string name="title_activity_view_task">ViewTaskActivity</string>
+    <string name="app_name">Simple Todo List</string>
+    <string name="title_activity_view_task">View/Edit task</string>
+    <string name="title_main">Tasks</string>
+    <string name="title_login">Login</string>
+    <string name="title_register">Register</string>
 </resources>
